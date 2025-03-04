@@ -28,26 +28,59 @@ cd flutter-docker
 cp .env-sample .env
 ```
 
-3. Torne o script auxiliar executável:
+3. Torne os scripts auxiliares executáveis:
 ```bash
 chmod +x flutter.sh
+chmod +x flutter-android-studio.sh
 ```
 
-4. Inicie o container:
+4. Configure o ambiente com um único comando:
 ```bash
-docker-compose up -d
+./flutter.sh setup
 ```
 
-5. Aguarde até que o Flutter SDK seja copiado para a pasta `workspace`
+Este comando irá:
+- Criar a pasta workspace se não existir
+- Iniciar o container Docker
+- Garantir que o Flutter SDK seja copiado corretamente
 
-## IMPORTANTE: Como executar comandos Flutter
+5. Verifique se a instalação está correta:
+```bash
+./flutter.sh doctor
+```
 
-Como os binários Flutter/Dart são compilados para Linux dentro do container, você NÃO pode executá-los diretamente do seu sistema operacional host (macOS, Windows). Você deve sempre executar os comandos Flutter dentro do container.
+## Usando com IDEs
 
-### Usando o script auxiliar
+### VSCode (Abordagem recomendada para novos desenvolvedores)
 
-Use o script `flutter.sh` incluído neste projeto para executar qualquer comando Flutter:
+O VSCode com a extensão Remote Containers proporciona a melhor experiência:
 
+1. Instale o VSCode
+2. Instale a extensão "Remote - Containers"
+3. Abra a pasta raiz deste projeto no VSCode
+4. Clique em "Reopen in Container" quando perguntado (ou use a paleta de comandos)
+5. O VSCode será reaberto dentro do container com todas as extensões e configurações prontas
+
+### Android Studio 
+
+Há uma integração especial para o Android Studio que permite desenvolver sem precisar instalar o Flutter localmente:
+
+1. Certifique-se de que o script `flutter-android-studio.sh` esteja com permissão de execução
+2. Configure as ferramentas externas no Android Studio conforme o guia [android-studio-integration.md](android-studio-integration.md)
+3. Use o menu Tools > External Tools ou os atalhos configurados para executar comandos Flutter
+
+Essa integração permite:
+- Abrir projetos Flutter do diretório `projects` no Android Studio
+- Executar comandos Flutter diretamente do Android Studio
+- Tudo funciona através do Docker sem precisar instalar Flutter localmente
+
+Para instruções detalhadas, consulte [android-studio-integration.md](android-studio-integration.md).
+
+## Executando comandos Flutter
+
+Você tem várias opções para executar comandos Flutter:
+
+### 1. Usando o script `flutter.sh`:
 ```bash
 # Verificar ambiente Flutter
 ./flutter.sh doctor
@@ -60,46 +93,23 @@ cd projects/meu_app
 ../../flutter.sh pub get
 ```
 
-### Método alternativo: execução direta no container
+### 2. A partir do Android Studio:
+Depois de configurar as ferramentas externas, use:
+- Menu Tools > External Tools > [comando desejado]
+- Ou os atalhos de teclado configurados
 
+### 3. No VSCode com Remote Containers:
+- Use o terminal integrado ou
+- Use as tarefas e extensões Flutter
+
+### 4. Execução direta no container:
 ```bash
 docker-compose exec flutter flutter [comando]
 ```
 
-Por exemplo:
-```bash
-docker-compose exec flutter flutter doctor
-docker-compose exec flutter flutter pub get
-```
-
-## Usando com IDEs
-
-### VSCode (Recomendado)
-
-O VSCode tem melhor suporte para este tipo de ambiente:
-
-1. Instale a extensão "Remote - Containers" no VSCode
-2. Abra a pasta raiz deste projeto no VSCode
-3. Clique em "Reopen in Container" quando perguntado (ou use a paleta de comandos)
-4. O VSCode será reaberto dentro do container com todas as extensões e configurações prontas
-
-### Android Studio
-
-Como o Android Studio não tem suporte nativo para desenvolvimento dentro de containers, você precisará configurá-lo para usar o script auxiliar:
-
-1. Abra o Android Studio
-2. Vá em `Preferences > Tools > External Tools`
-3. Adicione uma nova ferramenta:
-   - Name: Flutter
-   - Program: /caminho/para/seu/projeto/flutter.sh
-   - Arguments: $FilePathRelativeToProjectRoot$
-   - Working directory: $ProjectFileDir$
-
-4. Para abrir um projeto, use `File > Open` e navegue até a pasta `projects` deste projeto
-
 ## Estrutura de diretórios
 
-- `workspace/`: Contém o Flutter SDK
+- `workspace/`: Contém o Flutter SDK (gerenciado pelo Docker)
 - `projects/`: Seus projetos Flutter
 - `.devcontainer/`: Configuração para desenvolvimento com VSCode
 - `Dockerfile`: Definição do ambiente de desenvolvimento
@@ -118,16 +128,45 @@ Acesse o app pela URL: http://localhost:8080
 
 ## Solução de problemas
 
-### Erro: "cannot execute binary file"
+### Erro de binários incompatíveis
 
-Se você ver um erro como:
+Se encontrar erros como "cannot execute binary file", você está tentando executar os binários Linux diretamente no macOS/Windows. Use sempre:
+
+- O script `flutter.sh` 
+- O Android Studio com as ferramentas externas configuradas
+- VSCode com Remote Containers
+
+### Nenhum arquivo aparece na pasta workspace
+
+Se o Flutter não estiver sendo copiado para a pasta workspace:
+
+```bash
+# Reconfigurar o ambiente
+./flutter.sh setup
+
+# Verificar os logs para diagnóstico
+docker-compose logs flutter
 ```
-cannot execute binary file
+
+### Erro ao executar comandos pelo Android Studio
+
+Verifique:
+1. Se o container Docker está rodando (`docker-compose ps`)
+2. Se o caminho para o script `flutter-android-studio.sh` está correto
+3. Se o script tem permissão de execução
+
+## Diagnóstico avançado
+
+```bash
+# Ver logs do container
+docker-compose logs flutter
+
+# Acessar o shell do container
+docker-compose exec flutter bash
+
+# Verificar o conteúdo do volume Flutter
+docker-compose exec flutter ls -la /home/developer/flutter
 ```
-
-Isso significa que você está tentando executar os binários Flutter/Dart diretamente do seu sistema host. Estes binários são compilados para Linux e só funcionam dentro do container.
-
-Solução: Use sempre o script auxiliar (`./flutter.sh`) ou execute os comandos diretamente no container (`docker-compose exec flutter flutter comando`).
 
 ## Contribuição
 

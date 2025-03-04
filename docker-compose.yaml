@@ -2,8 +2,8 @@ services:
   flutter:
     build: .
     volumes:
-      - ${WORKSPACE_DIR:-./workspace}:/home/developer/flutter
-      - ${PROJECTS_DIR:-./projects}:/home/developer/projects
+      - flutter_sdk:/home/developer/flutter
+      - ./projects:/home/developer/projects
     working_dir: /home/developer/projects
     ports:
       - "${HOST_PORT:-8080}:${WEB_PORT:-8080}"
@@ -11,8 +11,19 @@ services:
       - ANDROID_SDK_ROOT=/home/developer/Android/sdk
       - PATH=/home/developer/flutter/bin:/home/developer/Android/sdk/platform-tools:$PATH
       - FLUTTER_VERSION=${FLUTTER_VERSION:-stable}
+      - GIT_DISCOVERY_ACROSS_FILESYSTEM=1
     command: /usr/local/bin/init-flutter.sh
     user: root
-    # Para permitir depuração
+    # Para permitir depuração e acesso entre sistemas de arquivos
     security_opt:
       - seccomp:unconfined
+    cap_add:
+      - SYS_ADMIN
+
+volumes:
+  flutter_sdk:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${PWD}/workspace
