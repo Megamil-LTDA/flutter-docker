@@ -1,0 +1,18 @@
+services:
+  flutter:
+    build: .
+    volumes:
+      - ${WORKSPACE_DIR:-./workspace}:/home/developer/flutter
+      - ${PROJECTS_DIR:-./projects}:/home/developer/projects
+    working_dir: /home/developer/projects
+    ports:
+      - "${HOST_PORT:-8080}:${WEB_PORT:-8080}"
+    environment:
+      - ANDROID_SDK_ROOT=/home/developer/Android/sdk
+      - PATH=/home/developer/flutter/bin:/home/developer/Android/sdk/platform-tools:$PATH
+      - FLUTTER_VERSION=${FLUTTER_VERSION:-stable}
+    command: /usr/local/bin/init-flutter.sh
+    user: root
+    # Para permitir depuração
+    security_opt:
+      - seccomp:unconfined

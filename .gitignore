@@ -1,0 +1,32 @@
+# Arquivos de ambiente
+.env
+
+# Diretórios de desenvolvimento
+workspace/
+projects/
+
+# Arquivos de sistema
+.DS_Store
+Thumbs.db
+
+# IDEs e editores
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Arquivos temporários
+*.log
+*.tmp
+tmp/
+temp/
+
+# Flutter/Dart específicos
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+build/
+.pub-cache/
+pubspec.lock 

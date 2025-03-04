@@ -1,0 +1,22 @@
+{
+    "name": "Flutter Development",
+    "dockerComposeFile": "../docker-compose.yaml",
+    "service": "flutter",
+    "workspaceFolder": "/home/developer/projects",
+    "extensions": [
+        "dart-code.dart-code",
+        "dart-code.flutter",
+        "nash.awesome-flutter-snippets",
+        "robertohuertasm.vscode-icons",
+        "auchenberg.vscode-browser-preview",
+        "redhat.vscode-yaml",
+        "ms-azuretools.vscode-docker"
+    ],
+    "settings": {
+        "terminal.integrated.shell.linux": "/bin/bash",
+        "dart.flutterSdkPath": "/home/developer/flutter",
+        "dart.sdkPath": "/home/developer/flutter/bin/cache/dart-sdk"
+    },
+    "forwardPorts": [8080],
+    "remoteUser": "developer"
+}
